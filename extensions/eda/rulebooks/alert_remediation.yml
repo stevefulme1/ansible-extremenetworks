@@ -1,0 +1,25 @@
+---
+- name: "Extremenetworks Alert Remediation"
+  hosts: all
+  sources:
+    - stevefulme1.extremenetworks.syslog:
+        host: 0.0.0.0
+        port: 5000
+  rules:
+    - name: Critical alert
+      condition: >-
+        event.extremenetworks.severity is defined and
+        event.extremenetworks.severity == "critical"
+      action:
+        run_playbook:
+          name: remediate.yml
+          extra_vars:
+            alert_host: "{{ event.extremenetworks.host | default('') }}"
+            alert_id: "{{ event.extremenetworks.id | default('') }}"
+    - name: Warning alert
+      condition: >-
+        event.extremenetworks.severity is defined and
+        event.extremenetworks.severity == "warning"
+      action:
+        print_event:
+          pretty: true
