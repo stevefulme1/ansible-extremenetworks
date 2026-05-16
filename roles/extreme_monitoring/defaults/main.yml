@@ -1,0 +1,14 @@
+---
+# defaults/main.yml for extreme_monitoring
+
+# Target host
+extreme_monitoring_host: ""
+
+# Authentication
+extreme_monitoring_username: ""
+extreme_monitoring_password: ""
+extreme_monitoring_api_key: ""
+
+# Behavior
+extreme_monitoring_validate_certs: true
+extreme_monitoring_state: present

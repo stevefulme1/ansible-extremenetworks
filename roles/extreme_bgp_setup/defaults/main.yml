@@ -1,0 +1,14 @@
+---
+# defaults/main.yml for extreme_bgp_setup
+
+# Target host
+extreme_bgp_setup_host: ""
+
+# Authentication
+extreme_bgp_setup_username: ""
+extreme_bgp_setup_password: ""
+extreme_bgp_setup_api_key: ""
+
+# Behavior
+extreme_bgp_setup_validate_certs: true
+extreme_bgp_setup_state: present

@@ -1,0 +1,16 @@
+---
+# tasks/main.yml for extreme_bgp_setup
+# Configure BGP peering and route policies
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - extreme_bgp_setup_host is defined
+    fail_msg: "extreme_bgp_setup_host must be defined"
+    quiet: true
+
+- name: Execute extreme bgp setup
+  ansible.builtin.debug:
+    msg: >-
+      Configure BGP peering and route policies.
+      Target: {{ extreme_bgp_setup_host }}

@@ -1,0 +1,16 @@
+---
+# tasks/main.yml for extreme_monitoring
+# Configure SNMP, syslog, and telemetry
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - extreme_monitoring_host is defined
+    fail_msg: "extreme_monitoring_host must be defined"
+    quiet: true
+
+- name: Execute extreme monitoring
+  ansible.builtin.debug:
+    msg: >-
+      Configure SNMP, syslog, and telemetry.
+      Target: {{ extreme_monitoring_host }}

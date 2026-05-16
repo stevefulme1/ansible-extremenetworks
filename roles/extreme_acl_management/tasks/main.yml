@@ -1,0 +1,16 @@
+---
+# tasks/main.yml for extreme_acl_management
+# Deploy and manage ACL policies
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - extreme_acl_management_host is defined
+    fail_msg: "extreme_acl_management_host must be defined"
+    quiet: true
+
+- name: Execute extreme acl management
+  ansible.builtin.debug:
+    msg: >-
+      Deploy and manage ACL policies.
+      Target: {{ extreme_acl_management_host }}

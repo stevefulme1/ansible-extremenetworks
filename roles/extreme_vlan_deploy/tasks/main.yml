@@ -1,0 +1,16 @@
+---
+# tasks/main.yml for extreme_vlan_deploy
+# Deploy VLANs across multiple switches
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - extreme_vlan_deploy_host is defined
+    fail_msg: "extreme_vlan_deploy_host must be defined"
+    quiet: true
+
+- name: Execute extreme vlan deploy
+  ansible.builtin.debug:
+    msg: >-
+      Deploy VLANs across multiple switches.
+      Target: {{ extreme_vlan_deploy_host }}

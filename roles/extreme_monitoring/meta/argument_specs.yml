@@ -1,0 +1,27 @@
+---
+argument_specs:
+  main:
+    short_description: "Configure SNMP, syslog, and telemetry"
+    options:
+      extreme_monitoring_host:
+        description: Target host address
+        type: str
+        required: true
+      extreme_monitoring_username:
+        description: Authentication username
+        type: str
+      extreme_monitoring_password:
+        description: Authentication password
+        type: str
+      extreme_monitoring_api_key:
+        description: API key for authentication
+        type: str
+      extreme_monitoring_validate_certs:
+        description: Validate SSL certificates
+        type: bool
+        default: true
+      extreme_monitoring_state:
+        description: Desired state
+        type: str
+        default: present
+        choices: [present, absent]

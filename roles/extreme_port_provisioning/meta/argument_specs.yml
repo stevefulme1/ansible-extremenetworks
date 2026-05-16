@@ -1,0 +1,27 @@
+---
+argument_specs:
+  main:
+    short_description: "Bulk port configuration and VLAN assignment"
+    options:
+      extreme_port_provisioning_host:
+        description: Target host address
+        type: str
+        required: true
+      extreme_port_provisioning_username:
+        description: Authentication username
+        type: str
+      extreme_port_provisioning_password:
+        description: Authentication password
+        type: str
+      extreme_port_provisioning_api_key:
+        description: API key for authentication
+        type: str
+      extreme_port_provisioning_validate_certs:
+        description: Validate SSL certificates
+        type: bool
+        default: true
+      extreme_port_provisioning_state:
+        description: Desired state
+        type: str
+        default: present
+        choices: [present, absent]

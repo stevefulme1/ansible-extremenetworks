@@ -1,0 +1,16 @@
+---
+# tasks/main.yml for extreme_firmware_upgrade
+# Rolling firmware upgrade via ExtremeCloud IQ
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - extreme_firmware_upgrade_host is defined
+    fail_msg: "extreme_firmware_upgrade_host must be defined"
+    quiet: true
+
+- name: Execute extreme firmware upgrade
+  ansible.builtin.debug:
+    msg: >-
+      Rolling firmware upgrade via ExtremeCloud IQ.
+      Target: {{ extreme_firmware_upgrade_host }}

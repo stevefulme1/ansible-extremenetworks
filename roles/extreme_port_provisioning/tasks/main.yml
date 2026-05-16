@@ -1,0 +1,16 @@
+---
+# tasks/main.yml for extreme_port_provisioning
+# Bulk port configuration and VLAN assignment
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - extreme_port_provisioning_host is defined
+    fail_msg: "extreme_port_provisioning_host must be defined"
+    quiet: true
+
+- name: Execute extreme port provisioning
+  ansible.builtin.debug:
+    msg: >-
+      Bulk port configuration and VLAN assignment.
+      Target: {{ extreme_port_provisioning_host }}

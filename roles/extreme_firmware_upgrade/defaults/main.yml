@@ -1,0 +1,14 @@
+---
+# defaults/main.yml for extreme_firmware_upgrade
+
+# Target host
+extreme_firmware_upgrade_host: ""
+
+# Authentication
+extreme_firmware_upgrade_username: ""
+extreme_firmware_upgrade_password: ""
+extreme_firmware_upgrade_api_key: ""
+
+# Behavior
+extreme_firmware_upgrade_validate_certs: true
+extreme_firmware_upgrade_state: present

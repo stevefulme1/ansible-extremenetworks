@@ -1,0 +1,27 @@
+---
+argument_specs:
+  main:
+    short_description: "Rolling firmware upgrade via ExtremeCloud IQ"
+    options:
+      extreme_firmware_upgrade_host:
+        description: Target host address
+        type: str
+        required: true
+      extreme_firmware_upgrade_username:
+        description: Authentication username
+        type: str
+      extreme_firmware_upgrade_password:
+        description: Authentication password
+        type: str
+      extreme_firmware_upgrade_api_key:
+        description: API key for authentication
+        type: str
+      extreme_firmware_upgrade_validate_certs:
+        description: Validate SSL certificates
+        type: bool
+        default: true
+      extreme_firmware_upgrade_state:
+        description: Desired state
+        type: str
+        default: present
+        choices: [present, absent]

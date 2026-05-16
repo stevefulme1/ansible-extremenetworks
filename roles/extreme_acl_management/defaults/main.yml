@@ -1,0 +1,14 @@
+---
+# defaults/main.yml for extreme_acl_management
+
+# Target host
+extreme_acl_management_host: ""
+
+# Authentication
+extreme_acl_management_username: ""
+extreme_acl_management_password: ""
+extreme_acl_management_api_key: ""
+
+# Behavior
+extreme_acl_management_validate_certs: true
+extreme_acl_management_state: present

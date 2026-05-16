@@ -1,0 +1,14 @@
+---
+# defaults/main.yml for extreme_security_hardening
+
+# Target host
+extreme_security_hardening_host: ""
+
+# Authentication
+extreme_security_hardening_username: ""
+extreme_security_hardening_password: ""
+extreme_security_hardening_api_key: ""
+
+# Behavior
+extreme_security_hardening_validate_certs: true
+extreme_security_hardening_state: present

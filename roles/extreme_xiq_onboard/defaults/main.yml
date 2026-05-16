@@ -1,0 +1,14 @@
+---
+# defaults/main.yml for extreme_xiq_onboard
+
+# Target host
+extreme_xiq_onboard_host: ""
+
+# Authentication
+extreme_xiq_onboard_username: ""
+extreme_xiq_onboard_password: ""
+extreme_xiq_onboard_api_key: ""
+
+# Behavior
+extreme_xiq_onboard_validate_certs: true
+extreme_xiq_onboard_state: present

@@ -1,0 +1,16 @@
+---
+# tasks/main.yml for extreme_backup_restore
+# Backup and restore device configurations
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - extreme_backup_restore_host is defined
+    fail_msg: "extreme_backup_restore_host must be defined"
+    quiet: true
+
+- name: Execute extreme backup restore
+  ansible.builtin.debug:
+    msg: >-
+      Backup and restore device configurations.
+      Target: {{ extreme_backup_restore_host }}

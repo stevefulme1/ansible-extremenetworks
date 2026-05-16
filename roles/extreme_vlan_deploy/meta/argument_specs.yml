@@ -1,0 +1,27 @@
+---
+argument_specs:
+  main:
+    short_description: "Deploy VLANs across multiple switches"
+    options:
+      extreme_vlan_deploy_host:
+        description: Target host address
+        type: str
+        required: true
+      extreme_vlan_deploy_username:
+        description: Authentication username
+        type: str
+      extreme_vlan_deploy_password:
+        description: Authentication password
+        type: str
+      extreme_vlan_deploy_api_key:
+        description: API key for authentication
+        type: str
+      extreme_vlan_deploy_validate_certs:
+        description: Validate SSL certificates
+        type: bool
+        default: true
+      extreme_vlan_deploy_state:
+        description: Desired state
+        type: str
+        default: present
+        choices: [present, absent]

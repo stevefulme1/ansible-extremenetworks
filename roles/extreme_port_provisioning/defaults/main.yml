@@ -1,0 +1,14 @@
+---
+# defaults/main.yml for extreme_port_provisioning
+
+# Target host
+extreme_port_provisioning_host: ""
+
+# Authentication
+extreme_port_provisioning_username: ""
+extreme_port_provisioning_password: ""
+extreme_port_provisioning_api_key: ""
+
+# Behavior
+extreme_port_provisioning_validate_certs: true
+extreme_port_provisioning_state: present

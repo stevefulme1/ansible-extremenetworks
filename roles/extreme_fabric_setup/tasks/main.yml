@@ -1,0 +1,16 @@
+---
+# tasks/main.yml for extreme_fabric_setup
+# Deploy SPB fabric on VOSS switches
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - extreme_fabric_setup_host is defined
+    fail_msg: "extreme_fabric_setup_host must be defined"
+    quiet: true
+
+- name: Execute extreme fabric setup
+  ansible.builtin.debug:
+    msg: >-
+      Deploy SPB fabric on VOSS switches.
+      Target: {{ extreme_fabric_setup_host }}

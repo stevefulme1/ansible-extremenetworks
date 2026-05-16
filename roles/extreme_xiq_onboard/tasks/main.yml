@@ -1,0 +1,16 @@
+---
+# tasks/main.yml for extreme_xiq_onboard
+# Onboard devices to ExtremeCloud IQ
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - extreme_xiq_onboard_host is defined
+    fail_msg: "extreme_xiq_onboard_host must be defined"
+    quiet: true
+
+- name: Execute extreme xiq onboard
+  ansible.builtin.debug:
+    msg: >-
+      Onboard devices to ExtremeCloud IQ.
+      Target: {{ extreme_xiq_onboard_host }}

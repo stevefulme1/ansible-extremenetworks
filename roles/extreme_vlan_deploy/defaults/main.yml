@@ -1,0 +1,14 @@
+---
+# defaults/main.yml for extreme_vlan_deploy
+
+# Target host
+extreme_vlan_deploy_host: ""
+
+# Authentication
+extreme_vlan_deploy_username: ""
+extreme_vlan_deploy_password: ""
+extreme_vlan_deploy_api_key: ""
+
+# Behavior
+extreme_vlan_deploy_validate_certs: true
+extreme_vlan_deploy_state: present

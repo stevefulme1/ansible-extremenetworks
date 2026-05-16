@@ -1,0 +1,16 @@
+---
+# tasks/main.yml for extreme_security_hardening
+# Apply network security best practices
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - extreme_security_hardening_host is defined
+    fail_msg: "extreme_security_hardening_host must be defined"
+    quiet: true
+
+- name: Execute extreme security hardening
+  ansible.builtin.debug:
+    msg: >-
+      Apply network security best practices.
+      Target: {{ extreme_security_hardening_host }}

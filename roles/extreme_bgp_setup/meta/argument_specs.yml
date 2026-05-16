@@ -1,0 +1,27 @@
+---
+argument_specs:
+  main:
+    short_description: "Configure BGP peering and route policies"
+    options:
+      extreme_bgp_setup_host:
+        description: Target host address
+        type: str
+        required: true
+      extreme_bgp_setup_username:
+        description: Authentication username
+        type: str
+      extreme_bgp_setup_password:
+        description: Authentication password
+        type: str
+      extreme_bgp_setup_api_key:
+        description: API key for authentication
+        type: str
+      extreme_bgp_setup_validate_certs:
+        description: Validate SSL certificates
+        type: bool
+        default: true
+      extreme_bgp_setup_state:
+        description: Desired state
+        type: str
+        default: present
+        choices: [present, absent]

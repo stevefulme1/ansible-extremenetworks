@@ -1,0 +1,14 @@
+---
+# defaults/main.yml for extreme_backup_restore
+
+# Target host
+extreme_backup_restore_host: ""
+
+# Authentication
+extreme_backup_restore_username: ""
+extreme_backup_restore_password: ""
+extreme_backup_restore_api_key: ""
+
+# Behavior
+extreme_backup_restore_validate_certs: true
+extreme_backup_restore_state: present

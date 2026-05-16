@@ -1,0 +1,14 @@
+---
+# defaults/main.yml for extreme_fabric_setup
+
+# Target host
+extreme_fabric_setup_host: ""
+
+# Authentication
+extreme_fabric_setup_username: ""
+extreme_fabric_setup_password: ""
+extreme_fabric_setup_api_key: ""
+
+# Behavior
+extreme_fabric_setup_validate_certs: true
+extreme_fabric_setup_state: present
