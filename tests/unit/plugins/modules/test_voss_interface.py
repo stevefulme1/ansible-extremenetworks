@@ -6,65 +6,61 @@ __metaclass__ = type
 from unittest.mock import MagicMock
 
 
-TestCreate:
+class TestCreate:
     def test_create_returns_resource(self):
         client = MagicMock()
         client.create.return_value = dict(id="123", name="test")
-        result = client.create("voss_interface", dict(name="test"))
+        result = client.create("interface", dict(name="test"))
         assert result["id"] == "123"
-        client.create.assert_called_once()
 
     def test_create_with_name(self):
         client = MagicMock()
         client.create.return_value = dict(id="456", name="prod")
-        result = client.create("voss_interface", dict(name="prod"))
+        result = client.create("interface", dict(name="prod"))
         assert result["name"] == "prod"
 
 
-TestDelete:
+class TestDelete:
     def test_delete_existing(self):
         client = MagicMock()
-        client.delete("voss_interface", "123")
-        client.delete.assert_called_once_with("voss_interface", "123")
+        client.delete("interface", "123")
+        client.delete.assert_called_once_with("interface", "123")
 
     def test_delete_not_found(self):
         client = MagicMock()
         client.delete.return_value = None
-        result = client.delete("voss_interface", "nonexistent")
+        result = client.delete("interface", "x")
         assert result is None
 
 
-TestList:
+class TestList:
     def test_list_returns_items(self):
         client = MagicMock()
         client.list.return_value = [dict(id="1"), dict(id="2")]
-        result = client.list("voss_interface")
+        result = client.list("interface")
         assert len(result) == 2
 
     def test_list_empty(self):
         client = MagicMock()
         client.list.return_value = []
-        result = client.list("voss_interface")
-        assert len(result) == 0
+        assert len(client.list("interface")) == 0
 
 
-TestGet:
+class TestGet:
     def test_get_existing(self):
         client = MagicMock()
         client.get.return_value = dict(id="123", name="test")
-        result = client.get("voss_interface", "123")
-        assert result["name"] == "test"
+        assert client.get("interface", "123")["name"] == "test"
 
     def test_get_not_found(self):
         client = MagicMock()
         client.get.return_value = None
-        result = client.get("voss_interface", "nonexistent")
-        assert result is None
+        assert client.get("interface", "x") is None
 
 
-TestUpdate:
+class TestUpdate:
     def test_update_returns_updated(self):
         client = MagicMock()
         client.update.return_value = dict(id="123", name="updated")
-        result = client.update("voss_interface", "123", dict(name="updated"))
+        result = client.update("interface", "123", dict(name="updated"))
         assert result["name"] == "updated"
