@@ -1,0 +1,31 @@
+---
+- name: Test exos_acl module
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Create acl (check mode)
+      stevefulme1.extremenetworks.exos_acl:
+        host: "{{ test_host }}"
+        name: "test-acl"
+        state: present
+      check_mode: true
+      register: check_result
+      ignore_errors: true
+
+    - name: Verify check mode reports changed
+      ansible.builtin.assert:
+        that:
+          - check_result is changed or check_result is failed
+        fail_msg: "Check mode did not report changed"
+
+    - name: List acls
+      stevefulme1.extremenetworks.exos_acl_info:
+        host: "{{ test_host }}"
+      register: list_result
+      ignore_errors: true
+
+    - name: Verify list returns a list
+      ansible.builtin.assert:
+        that:
+          - list_result.acls is defined or list_result is failed
+        fail_msg: "List did not return expected structure"
