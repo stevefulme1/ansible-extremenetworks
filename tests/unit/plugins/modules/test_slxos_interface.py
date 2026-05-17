@@ -18,8 +18,8 @@ def mock_api_client():
     """Mock API client for slxos_interface."""
     client = MagicMock()
     client.get.return_value = None
-    client.create.return_value = {"interface_name": "res-123", "interface_name": "test-slxos_interface"}
-    client.update.return_value = {"interface_name": "res-123", "interface_name": "test-slxos_interface-updated"}
+    client.create.return_value = {"id": "res-123", "interface_name": "test-slxos_interface"}
+    client.update.return_value = {"id": "res-123", "interface_name": "test-slxos_interface-updated"}
     client.delete.return_value = None
     client.list.return_value = []
     return client
@@ -29,7 +29,7 @@ def mock_api_client():
 def existing_resource():
     """Return a dict representing an existing slxos_interface."""
     return {
-        "interface_name": "res-123",
+        "id": "res-123",
         "interface_name": "test-slxos_interface",
         "state": "active",
     }
@@ -41,7 +41,7 @@ class TestCreateSlxosInterface:
     def test_create_returns_resource(self, mock_api_client):
         """Verify create returns resource dict with expected fields."""
         result = mock_api_client.create("slxos_interface", {"interface_name": "test-slxos_interface"})
-        assert result["interface_name"] == "res-123"
+        assert result["id"] == "res-123"
         assert result["interface_name"] == "test-slxos_interface"
         mock_api_client.create.assert_called_once()
 
@@ -143,7 +143,7 @@ class TestGetSlxosInterface:
         """Verify get returns resource when it exists."""
         mock_api_client.get.return_value = existing_resource
         result = mock_api_client.get("slxos_interface", "res-123")
-        assert result["interface_name"] == "res-123"
+        assert result["id"] == "res-123"
 
     def test_get_nonexistent(self, mock_api_client):
         """Verify get returns None for missing resource."""
