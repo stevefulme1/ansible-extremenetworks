@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -18,8 +18,8 @@ def mock_api_client():
     """Mock API client for exos_bgp."""
     client = MagicMock()
     client.get.return_value = None
-    client.create.return_value = {"neighbor_address": "res-123", "neighbor_address": "test-exos_bgp"}
-    client.update.return_value = {"neighbor_address": "res-123", "neighbor_address": "test-exos_bgp-updated"}
+    client.create.return_value = {"id": "res-123", "neighbor_address": "test-exos_bgp"}
+    client.update.return_value = {"id": "res-123", "neighbor_address": "test-exos_bgp-updated"}
     client.delete.return_value = None
     client.list.return_value = []
     return client
@@ -29,7 +29,7 @@ def mock_api_client():
 def existing_resource():
     """Return a dict representing an existing exos_bgp."""
     return {
-        "neighbor_address": "res-123",
+        "id": "res-123",
         "neighbor_address": "test-exos_bgp",
         "state": "active",
     }
@@ -41,7 +41,7 @@ class TestCreateExosBgp:
     def test_create_returns_resource(self, mock_api_client):
         """Verify create returns resource dict with expected fields."""
         result = mock_api_client.create("exos_bgp", {"neighbor_address": "test-exos_bgp"})
-        assert result["neighbor_address"] == "res-123"
+        assert result["id"] == "res-123"
         assert result["neighbor_address"] == "test-exos_bgp"
         mock_api_client.create.assert_called_once()
 
@@ -143,7 +143,7 @@ class TestGetExosBgp:
         """Verify get returns resource when it exists."""
         mock_api_client.get.return_value = existing_resource
         result = mock_api_client.get("exos_bgp", "res-123")
-        assert result["neighbor_address"] == "res-123"
+        assert result["id"] == "res-123"
 
     def test_get_nonexistent(self, mock_api_client):
         """Verify get returns None for missing resource."""
@@ -165,8 +165,8 @@ class TestListExosBgp:
     def test_list_returns_all(self, mock_api_client):
         """Verify list returns all resources."""
         mock_api_client.list.return_value = [
-            {"neighbor_address": "1", "neighbor_address": "first"},
-            {"neighbor_address": "2", "neighbor_address": "second"},
+            {"id": "1", "neighbor_address": "first"},
+            {"id": "2", "neighbor_address": "second"},
         ]
         result = mock_api_client.list("exos_bgp")
         assert len(result) == 2
@@ -178,7 +178,7 @@ class TestListExosBgp:
 
     def test_list_with_filter(self, mock_api_client):
         """Verify list applies filters."""
-        mock_api_client.list.return_value = [{"neighbor_address": "1", "neighbor_address": "match"}]
+        mock_api_client.list.return_value = [{"id": "1", "neighbor_address": "match"}]
         result = mock_api_client.list("exos_bgp", filters={"neighbor_address": "match"})
         assert len(result) == 1
 

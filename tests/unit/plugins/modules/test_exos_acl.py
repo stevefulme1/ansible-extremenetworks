@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -18,8 +18,8 @@ def mock_api_client():
     """Mock API client for exos_acl."""
     client = MagicMock()
     client.get.return_value = None
-    client.create.return_value = {"acl_name": "res-123", "acl_name": "test-exos_acl"}
-    client.update.return_value = {"acl_name": "res-123", "acl_name": "test-exos_acl-updated"}
+    client.create.return_value = {"id": "res-123", "acl_name": "test-exos_acl"}
+    client.update.return_value = {"id": "res-123", "acl_name": "test-exos_acl-updated"}
     client.delete.return_value = None
     client.list.return_value = []
     return client
@@ -29,7 +29,7 @@ def mock_api_client():
 def existing_resource():
     """Return a dict representing an existing exos_acl."""
     return {
-        "acl_name": "res-123",
+        "id": "res-123",
         "acl_name": "test-exos_acl",
         "state": "active",
     }
@@ -41,7 +41,7 @@ class TestCreateExosAcl:
     def test_create_returns_resource(self, mock_api_client):
         """Verify create returns resource dict with expected fields."""
         result = mock_api_client.create("exos_acl", {"acl_name": "test-exos_acl"})
-        assert result["acl_name"] == "res-123"
+        assert result["id"] == "res-123"
         assert result["acl_name"] == "test-exos_acl"
         mock_api_client.create.assert_called_once()
 
@@ -143,7 +143,7 @@ class TestGetExosAcl:
         """Verify get returns resource when it exists."""
         mock_api_client.get.return_value = existing_resource
         result = mock_api_client.get("exos_acl", "res-123")
-        assert result["acl_name"] == "res-123"
+        assert result["id"] == "res-123"
 
     def test_get_nonexistent(self, mock_api_client):
         """Verify get returns None for missing resource."""
@@ -165,8 +165,8 @@ class TestListExosAcl:
     def test_list_returns_all(self, mock_api_client):
         """Verify list returns all resources."""
         mock_api_client.list.return_value = [
-            {"acl_name": "1", "acl_name": "first"},
-            {"acl_name": "2", "acl_name": "second"},
+            {"id": "1", "acl_name": "first"},
+            {"id": "2", "acl_name": "second"},
         ]
         result = mock_api_client.list("exos_acl")
         assert len(result) == 2
@@ -178,7 +178,7 @@ class TestListExosAcl:
 
     def test_list_with_filter(self, mock_api_client):
         """Verify list applies filters."""
-        mock_api_client.list.return_value = [{"acl_name": "1", "acl_name": "match"}]
+        mock_api_client.list.return_value = [{"id": "1", "acl_name": "match"}]
         result = mock_api_client.list("exos_acl", filters={"acl_name": "match"})
         assert len(result) == 1
 

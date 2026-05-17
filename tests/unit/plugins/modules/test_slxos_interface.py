@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -165,8 +165,8 @@ class TestListSlxosInterface:
     def test_list_returns_all(self, mock_api_client):
         """Verify list returns all resources."""
         mock_api_client.list.return_value = [
-            {"interface_name": "1", "interface_name": "first"},
-            {"interface_name": "2", "interface_name": "second"},
+            {"id": "1", "interface_name": "first"},
+            {"id": "2", "interface_name": "second"},
         ]
         result = mock_api_client.list("slxos_interface")
         assert len(result) == 2
@@ -178,7 +178,7 @@ class TestListSlxosInterface:
 
     def test_list_with_filter(self, mock_api_client):
         """Verify list applies filters."""
-        mock_api_client.list.return_value = [{"interface_name": "1", "interface_name": "match"}]
+        mock_api_client.list.return_value = [{"id": "1", "interface_name": "match"}]
         result = mock_api_client.list("slxos_interface", filters={"interface_name": "match"})
         assert len(result) == 1
 

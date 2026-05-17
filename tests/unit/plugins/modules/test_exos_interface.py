@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -18,8 +18,8 @@ def mock_api_client():
     """Mock API client for exos_interface."""
     client = MagicMock()
     client.get.return_value = None
-    client.create.return_value = {"interface_name": "res-123", "interface_name": "test-exos_interface"}
-    client.update.return_value = {"interface_name": "res-123", "interface_name": "test-exos_interface-updated"}
+    client.create.return_value = {"id": "res-123", "interface_name": "test-exos_interface"}
+    client.update.return_value = {"id": "res-123", "interface_name": "test-exos_interface-updated"}
     client.delete.return_value = None
     client.list.return_value = []
     return client
@@ -29,7 +29,7 @@ def mock_api_client():
 def existing_resource():
     """Return a dict representing an existing exos_interface."""
     return {
-        "interface_name": "res-123",
+        "id": "res-123",
         "interface_name": "test-exos_interface",
         "state": "active",
     }
@@ -41,7 +41,7 @@ class TestCreateExosInterface:
     def test_create_returns_resource(self, mock_api_client):
         """Verify create returns resource dict with expected fields."""
         result = mock_api_client.create("exos_interface", {"interface_name": "test-exos_interface"})
-        assert result["interface_name"] == "res-123"
+        assert result["id"] == "res-123"
         assert result["interface_name"] == "test-exos_interface"
         mock_api_client.create.assert_called_once()
 
@@ -143,7 +143,7 @@ class TestGetExosInterface:
         """Verify get returns resource when it exists."""
         mock_api_client.get.return_value = existing_resource
         result = mock_api_client.get("exos_interface", "res-123")
-        assert result["interface_name"] == "res-123"
+        assert result["id"] == "res-123"
 
     def test_get_nonexistent(self, mock_api_client):
         """Verify get returns None for missing resource."""
@@ -165,8 +165,8 @@ class TestListExosInterface:
     def test_list_returns_all(self, mock_api_client):
         """Verify list returns all resources."""
         mock_api_client.list.return_value = [
-            {"interface_name": "1", "interface_name": "first"},
-            {"interface_name": "2", "interface_name": "second"},
+            {"id": "1", "interface_name": "first"},
+            {"id": "2", "interface_name": "second"},
         ]
         result = mock_api_client.list("exos_interface")
         assert len(result) == 2
@@ -178,7 +178,7 @@ class TestListExosInterface:
 
     def test_list_with_filter(self, mock_api_client):
         """Verify list applies filters."""
-        mock_api_client.list.return_value = [{"interface_name": "1", "interface_name": "match"}]
+        mock_api_client.list.return_value = [{"id": "1", "interface_name": "match"}]
         result = mock_api_client.list("exos_interface", filters={"interface_name": "match"})
         assert len(result) == 1
 

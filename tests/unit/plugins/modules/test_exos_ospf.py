@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -18,8 +18,8 @@ def mock_api_client():
     """Mock API client for exos_ospf."""
     client = MagicMock()
     client.get.return_value = None
-    client.create.return_value = {"area_id": "res-123", "area_id": "test-exos_ospf"}
-    client.update.return_value = {"area_id": "res-123", "area_id": "test-exos_ospf-updated"}
+    client.create.return_value = {"id": "res-123", "area_id": "test-exos_ospf"}
+    client.update.return_value = {"id": "res-123", "area_id": "test-exos_ospf-updated"}
     client.delete.return_value = None
     client.list.return_value = []
     return client
@@ -29,7 +29,7 @@ def mock_api_client():
 def existing_resource():
     """Return a dict representing an existing exos_ospf."""
     return {
-        "area_id": "res-123",
+        "id": "res-123",
         "area_id": "test-exos_ospf",
         "state": "active",
     }
@@ -41,7 +41,7 @@ class TestCreateExosOspf:
     def test_create_returns_resource(self, mock_api_client):
         """Verify create returns resource dict with expected fields."""
         result = mock_api_client.create("exos_ospf", {"area_id": "test-exos_ospf"})
-        assert result["area_id"] == "res-123"
+        assert result["id"] == "res-123"
         assert result["area_id"] == "test-exos_ospf"
         mock_api_client.create.assert_called_once()
 
@@ -143,7 +143,7 @@ class TestGetExosOspf:
         """Verify get returns resource when it exists."""
         mock_api_client.get.return_value = existing_resource
         result = mock_api_client.get("exos_ospf", "res-123")
-        assert result["area_id"] == "res-123"
+        assert result["id"] == "res-123"
 
     def test_get_nonexistent(self, mock_api_client):
         """Verify get returns None for missing resource."""
@@ -165,8 +165,8 @@ class TestListExosOspf:
     def test_list_returns_all(self, mock_api_client):
         """Verify list returns all resources."""
         mock_api_client.list.return_value = [
-            {"area_id": "1", "area_id": "first"},
-            {"area_id": "2", "area_id": "second"},
+            {"id": "1", "area_id": "first"},
+            {"id": "2", "area_id": "second"},
         ]
         result = mock_api_client.list("exos_ospf")
         assert len(result) == 2
@@ -178,7 +178,7 @@ class TestListExosOspf:
 
     def test_list_with_filter(self, mock_api_client):
         """Verify list applies filters."""
-        mock_api_client.list.return_value = [{"area_id": "1", "area_id": "match"}]
+        mock_api_client.list.return_value = [{"id": "1", "area_id": "match"}]
         result = mock_api_client.list("exos_ospf", filters={"area_id": "match"})
         assert len(result) == 1
 
