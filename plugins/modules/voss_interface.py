@@ -108,7 +108,8 @@ def main():
         if resource_id:
             existing = client.get("voss_interface", resource_id)
         elif module.params.get("name"):
-            candidates = client.list("voss_interface", {dict(name=module.params.get("name", ""))})
+            name_filter = module.params.get("name", "")
+            candidates = client.list("voss_interface", {"name": name_filter})
             if candidates:
                 existing = candidates[0]
 

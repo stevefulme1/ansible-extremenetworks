@@ -108,7 +108,8 @@ def main():
         if resource_id:
             existing = client.get("slxos_bgp", resource_id)
         elif module.params.get("name"):
-            candidates = client.list("slxos_bgp", {dict(name=module.params.get("name", ""))})
+            name_filter = module.params.get("name", "")
+            candidates = client.list("slxos_bgp", {"name": name_filter})
             if candidates:
                 existing = candidates[0]
 
