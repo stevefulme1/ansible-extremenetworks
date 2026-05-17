@@ -108,7 +108,7 @@ def main():
         if resource_id:
             existing = client.get("voss_vlan", resource_id)
         elif module.params.get("name"):
-            candidates = client.list("voss_vlan", {{"name": module.params["name"]}})
+            candidates = client.list("voss_vlan", {dict(name=module.params.get("name", ""))})
             if candidates:
                 existing = candidates[0]
 

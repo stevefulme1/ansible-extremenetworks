@@ -108,7 +108,7 @@ def main():
         if resource_id:
             existing = client.get("static_route", resource_id)
         elif module.params.get("name"):
-            candidates = client.list("static_route", {{"name": module.params["name"]}})
+            candidates = client.list("static_route", {dict(name=module.params.get("name", ""))})
             if candidates:
                 existing = candidates[0]
 

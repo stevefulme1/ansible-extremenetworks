@@ -108,7 +108,7 @@ def main():
         if resource_id:
             existing = client.get("xiq_firmware", resource_id)
         elif module.params.get("name"):
-            candidates = client.list("xiq_firmware", {{"name": module.params["name"]}})
+            candidates = client.list("xiq_firmware", {dict(name=module.params.get("name", ""))})
             if candidates:
                 existing = candidates[0]
 

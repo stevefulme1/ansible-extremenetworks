@@ -108,7 +108,7 @@ def main():
         if resource_id:
             existing = client.get("xiq_ssid", resource_id)
         elif module.params.get("name"):
-            candidates = client.list("xiq_ssid", {{"name": module.params["name"]}})
+            candidates = client.list("xiq_ssid", {dict(name=module.params.get("name", ""))})
             if candidates:
                 existing = candidates[0]
 
