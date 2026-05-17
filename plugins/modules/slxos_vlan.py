@@ -104,14 +104,30 @@ def main():
     resource_id = module.params.get("vlan_id")
 
     if state == "present":
+        existing = None
         if resource_id:
-            result = client.update("slxos_vlan", resource_id, module.params)
+            existing = client.get("slxos_vlan", resource_id)
+        elif module.params.get("name"):
+            candidates = client.list("slxos_vlan", {{"name": module.params["name"]}})
+            if candidates:
+                existing = candidates[0]
+
+        if existing:
+            if module.check_mode:
+                module.exit_json(changed=False, slxos_vlan=existing)
+            result = client.update("slxos_vlan", resource_id or existing.get("id", ""), module.params)
+            module.exit_json(changed=True, slxos_vlan=result)
         else:
             if module.check_mode:
                 module.exit_json(changed=True)
             result = client.create("slxos_vlan", module.params)
-        module.exit_json(changed=True, slxos_vlan=result)
+            module.exit_json(changed=True, slxos_vlan=result)
     else:
+        existing = None
+        if resource_id:
+            existing = client.get("slxos_vlan", resource_id)
+        if not existing:
+            module.exit_json(changed=False)
         if module.check_mode:
             module.exit_json(changed=True)
         client.delete("slxos_vlan", resource_id)

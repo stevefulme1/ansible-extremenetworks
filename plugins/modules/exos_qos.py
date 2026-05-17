@@ -104,14 +104,30 @@ def main():
     resource_id = module.params.get("qos_profile")
 
     if state == "present":
+        existing = None
         if resource_id:
-            result = client.update("qos", resource_id, module.params)
+            existing = client.get("qos", resource_id)
+        elif module.params.get("name"):
+            candidates = client.list("qos", {{"name": module.params["name"]}})
+            if candidates:
+                existing = candidates[0]
+
+        if existing:
+            if module.check_mode:
+                module.exit_json(changed=False, qos=existing)
+            result = client.update("qos", resource_id or existing.get("id", ""), module.params)
+            module.exit_json(changed=True, qos=result)
         else:
             if module.check_mode:
                 module.exit_json(changed=True)
             result = client.create("qos", module.params)
-        module.exit_json(changed=True, qos=result)
+            module.exit_json(changed=True, qos=result)
     else:
+        existing = None
+        if resource_id:
+            existing = client.get("qos", resource_id)
+        if not existing:
+            module.exit_json(changed=False)
         if module.check_mode:
             module.exit_json(changed=True)
         client.delete("qos", resource_id)

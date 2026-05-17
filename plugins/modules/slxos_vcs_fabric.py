@@ -104,14 +104,30 @@ def main():
     resource_id = module.params.get("fabric_id")
 
     if state == "present":
+        existing = None
         if resource_id:
-            result = client.update("vcs_fabric", resource_id, module.params)
+            existing = client.get("vcs_fabric", resource_id)
+        elif module.params.get("name"):
+            candidates = client.list("vcs_fabric", {{"name": module.params["name"]}})
+            if candidates:
+                existing = candidates[0]
+
+        if existing:
+            if module.check_mode:
+                module.exit_json(changed=False, vcs_fabric=existing)
+            result = client.update("vcs_fabric", resource_id or existing.get("id", ""), module.params)
+            module.exit_json(changed=True, vcs_fabric=result)
         else:
             if module.check_mode:
                 module.exit_json(changed=True)
             result = client.create("vcs_fabric", module.params)
-        module.exit_json(changed=True, vcs_fabric=result)
+            module.exit_json(changed=True, vcs_fabric=result)
     else:
+        existing = None
+        if resource_id:
+            existing = client.get("vcs_fabric", resource_id)
+        if not existing:
+            module.exit_json(changed=False)
         if module.check_mode:
             module.exit_json(changed=True)
         client.delete("vcs_fabric", resource_id)

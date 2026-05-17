@@ -104,14 +104,30 @@ def main():
     resource_id = module.params.get("vni_id")
 
     if state == "present":
+        existing = None
         if resource_id:
-            result = client.update("vxlan", resource_id, module.params)
+            existing = client.get("vxlan", resource_id)
+        elif module.params.get("name"):
+            candidates = client.list("vxlan", {{"name": module.params["name"]}})
+            if candidates:
+                existing = candidates[0]
+
+        if existing:
+            if module.check_mode:
+                module.exit_json(changed=False, vxlan=existing)
+            result = client.update("vxlan", resource_id or existing.get("id", ""), module.params)
+            module.exit_json(changed=True, vxlan=result)
         else:
             if module.check_mode:
                 module.exit_json(changed=True)
             result = client.create("vxlan", module.params)
-        module.exit_json(changed=True, vxlan=result)
+            module.exit_json(changed=True, vxlan=result)
     else:
+        existing = None
+        if resource_id:
+            existing = client.get("vxlan", resource_id)
+        if not existing:
+            module.exit_json(changed=False)
         if module.check_mode:
             module.exit_json(changed=True)
         client.delete("vxlan", resource_id)

@@ -104,14 +104,30 @@ def main():
     resource_id = module.params.get("floor_id")
 
     if state == "present":
+        existing = None
         if resource_id:
-            result = client.update("xiq_floor", resource_id, module.params)
+            existing = client.get("xiq_floor", resource_id)
+        elif module.params.get("name"):
+            candidates = client.list("xiq_floor", {{"name": module.params["name"]}})
+            if candidates:
+                existing = candidates[0]
+
+        if existing:
+            if module.check_mode:
+                module.exit_json(changed=False, xiq_floor=existing)
+            result = client.update("xiq_floor", resource_id or existing.get("id", ""), module.params)
+            module.exit_json(changed=True, xiq_floor=result)
         else:
             if module.check_mode:
                 module.exit_json(changed=True)
             result = client.create("xiq_floor", module.params)
-        module.exit_json(changed=True, xiq_floor=result)
+            module.exit_json(changed=True, xiq_floor=result)
     else:
+        existing = None
+        if resource_id:
+            existing = client.get("xiq_floor", resource_id)
+        if not existing:
+            module.exit_json(changed=False)
         if module.check_mode:
             module.exit_json(changed=True)
         client.delete("xiq_floor", resource_id)

@@ -104,14 +104,30 @@ def main():
     resource_id = module.params.get("route_prefix")
 
     if state == "present":
+        existing = None
         if resource_id:
-            result = client.update("static_route", resource_id, module.params)
+            existing = client.get("static_route", resource_id)
+        elif module.params.get("name"):
+            candidates = client.list("static_route", {{"name": module.params["name"]}})
+            if candidates:
+                existing = candidates[0]
+
+        if existing:
+            if module.check_mode:
+                module.exit_json(changed=False, static_route=existing)
+            result = client.update("static_route", resource_id or existing.get("id", ""), module.params)
+            module.exit_json(changed=True, static_route=result)
         else:
             if module.check_mode:
                 module.exit_json(changed=True)
             result = client.create("static_route", module.params)
-        module.exit_json(changed=True, static_route=result)
+            module.exit_json(changed=True, static_route=result)
     else:
+        existing = None
+        if resource_id:
+            existing = client.get("static_route", resource_id)
+        if not existing:
+            module.exit_json(changed=False)
         if module.check_mode:
             module.exit_json(changed=True)
         client.delete("static_route", resource_id)

@@ -104,14 +104,30 @@ def main():
     resource_id = module.params.get("device_id")
 
     if state == "present":
+        existing = None
         if resource_id:
-            result = client.update("xiq_device", resource_id, module.params)
+            existing = client.get("xiq_device", resource_id)
+        elif module.params.get("name"):
+            candidates = client.list("xiq_device", {{"name": module.params["name"]}})
+            if candidates:
+                existing = candidates[0]
+
+        if existing:
+            if module.check_mode:
+                module.exit_json(changed=False, xiq_device=existing)
+            result = client.update("xiq_device", resource_id or existing.get("id", ""), module.params)
+            module.exit_json(changed=True, xiq_device=result)
         else:
             if module.check_mode:
                 module.exit_json(changed=True)
             result = client.create("xiq_device", module.params)
-        module.exit_json(changed=True, xiq_device=result)
+            module.exit_json(changed=True, xiq_device=result)
     else:
+        existing = None
+        if resource_id:
+            existing = client.get("xiq_device", resource_id)
+        if not existing:
+            module.exit_json(changed=False)
         if module.check_mode:
             module.exit_json(changed=True)
         client.delete("xiq_device", resource_id)
