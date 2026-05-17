@@ -1,9 +1,9 @@
 ---
-# Integration tests for stevefulme1.extremenetworks.exos_acl
+# Integration tests for stevefulme1.extremenetworks.xiq_device
 # These tests require valid credentials configured in integration_config.yml
 
-- name: Create exos_acl (check_mode)
-  stevefulme1.extremenetworks.exos_acl:
+- name: Create xiq_device (check_mode)
+  stevefulme1.extremenetworks.xiq_device:
     host: "{{ extremenetworks_host }}"
     api_key: "{{ extremenetworks_api_key }}"
     state: present
@@ -17,8 +17,8 @@
     that:
       - check_result is changed
 
-- name: Create exos_acl
-  stevefulme1.extremenetworks.exos_acl:
+- name: Create xiq_device
+  stevefulme1.extremenetworks.xiq_device:
     host: "{{ extremenetworks_host }}"
     api_key: "{{ extremenetworks_api_key }}"
     state: present
@@ -26,14 +26,14 @@
     validate_certs: "{{ validate_certs | default(true) }}"
   register: create_result
 
-- name: Verify exos_acl was created
+- name: Verify xiq_device was created
   ansible.builtin.assert:
     that:
       - create_result is changed
-      - create_result.exos_acl is defined
+      - create_result.xiq_device is defined
 
-- name: Create exos_acl again (idempotency)
-  stevefulme1.extremenetworks.exos_acl:
+- name: Create xiq_device again (idempotency)
+  stevefulme1.extremenetworks.xiq_device:
     host: "{{ extremenetworks_host }}"
     api_key: "{{ extremenetworks_api_key }}"
     state: present
@@ -46,8 +46,8 @@
     that:
       - idem_result is not changed
 
-- name: Delete exos_acl (check_mode)
-  stevefulme1.extremenetworks.exos_acl:
+- name: Delete xiq_device (check_mode)
+  stevefulme1.extremenetworks.xiq_device:
     host: "{{ extremenetworks_host }}"
     api_key: "{{ extremenetworks_api_key }}"
     state: absent
@@ -61,8 +61,8 @@
     that:
       - delete_check is changed
 
-- name: Delete exos_acl
-  stevefulme1.extremenetworks.exos_acl:
+- name: Delete xiq_device
+  stevefulme1.extremenetworks.xiq_device:
     host: "{{ extremenetworks_host }}"
     api_key: "{{ extremenetworks_api_key }}"
     state: absent
@@ -70,13 +70,13 @@
     validate_certs: "{{ validate_certs | default(true) }}"
   register: delete_result
 
-- name: Verify exos_acl was deleted
+- name: Verify xiq_device was deleted
   ansible.builtin.assert:
     that:
       - delete_result is changed
 
-- name: Delete exos_acl again (idempotent)
-  stevefulme1.extremenetworks.exos_acl:
+- name: Delete xiq_device again (idempotent)
+  stevefulme1.extremenetworks.xiq_device:
     host: "{{ extremenetworks_host }}"
     api_key: "{{ extremenetworks_api_key }}"
     state: absent
