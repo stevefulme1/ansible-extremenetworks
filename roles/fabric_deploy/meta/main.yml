@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  role_name: fabric_deploy
+  author: Red Hat Ansible
+  description: Deploy Extreme Networks SPB/VXLAN fabric with ISIS and multicast
+  license: GPL-3.0-or-later
+  min_ansible_version: "2.14"
+  platforms:
+    - name: EXOS
+      versions: [all]
+  galaxy_tags: [extreme, network, fabric, spb, vxlan]
+dependencies: []

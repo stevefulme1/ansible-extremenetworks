@@ -1,0 +1,50 @@
+---
+# Required
+# fabric_node_id: ""     # Unique IS-IS system ID (e.g., "00bb.0000.0001")
+# fabric_nickname: ""    # SPB nickname (e.g., "1.1.1")
+
+# Fabric type
+fabric_type: "spbm"  # spbm or vxlan
+
+# IS-IS configuration
+fabric_isis_area: "49.0001"
+fabric_isis_overload_on_startup: 60
+fabric_isis_lsp_lifetime: 65535
+fabric_isis_spf_delay: 100
+
+# SPB-M settings
+fabric_bvlans:
+  - id: 4051
+    name: "Services"
+    isid_range_start: 10000
+    isid_range_end: 20000
+  - id: 4052
+    name: "Transport"
+    isid_range_start: 20001
+    isid_range_end: 30000
+
+# Service instances
+fabric_services: []
+#   - isid: 10001
+#     vlan_id: 100
+#     name: "Web-Tier"
+#   - isid: 10002
+#     vlan_id: 200
+#     name: "App-Tier"
+
+# VXLAN settings (when fabric_type is vxlan)
+fabric_vxlan_vtep_ip: ""
+fabric_vxlan_vnis: []
+#   - vni: 10100
+#     vlan_id: 100
+
+# Fabric interfaces
+fabric_uplink_ports: []
+#   - port: "1"
+#     description: "Fabric uplink to spine-1"
+
+# Multicast
+fabric_multicast_enabled: true
+
+# Save
+fabric_save_config: true
