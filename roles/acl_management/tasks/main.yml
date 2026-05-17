@@ -1,0 +1,79 @@
+---
+- name: Manage ACL configuration
+  block:
+    - name: Create IPv4 ACL policies
+      extreme.exos.exos_config:
+        lines:
+          - "create access-list {{ item.name }}"
+      loop: "{{ acl_policies }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: acl_policies | length > 0
+
+    - name: Configure ACL rules
+      extreme.exos.exos_config:
+        lines:
+          - >-
+            configure access-list {{ item.0.name }} add entry {{ item.1.entry }}
+            {{ item.1.action }}
+            {% if item.1.protocol is defined %}protocol {{ item.1.protocol }}{% endif %}
+            {% if item.1.source is defined %}source-address {{ item.1.source }}{% endif %}
+            {% if item.1.destination is defined %}destination-address {{ item.1.destination }}{% endif %}
+            {% if item.1.destination_port is defined %}destination-port {{ item.1.destination_port }}{% endif %}
+            {% if item.1.source_port is defined %}source-port {{ item.1.source_port }}{% endif %}
+      loop: "{{ acl_policies | subelements('rules') }}"
+      loop_control:
+        label: "{{ item.0.name }} entry {{ item.1.entry }}"
+      when: acl_policies | length > 0
+
+    - name: Apply ACLs to ports
+      extreme.exos.exos_config:
+        lines:
+          - "configure access-list {{ item.0.policy }} ports {{ item.1 }} {{ item.0.direction | default('ingress') }}"
+      loop: "{{ acl_port_bindings | subelements('ports') }}"
+      loop_control:
+        label: "{{ item.0.policy }} -> port {{ item.1 }}"
+      when: acl_port_bindings | length > 0
+
+    - name: Apply ACLs to VLANs
+      extreme.exos.exos_config:
+        lines:
+          - "configure access-list {{ item.policy }} vlan {{ item.vlan }} {{ item.direction | default('ingress') }}"
+      loop: "{{ acl_vlan_bindings }}"
+      loop_control:
+        label: "{{ item.policy }} -> VLAN {{ item.vlan }}"
+      when: acl_vlan_bindings | length > 0
+
+    - name: Configure port security
+      extreme.exos.exos_config:
+        lines:
+          - "configure port {{ item.port }} limit-learning {{ item.max_mac | default(5) }}"
+          - "configure port {{ item.port }} lock-learning"
+          - "enable port {{ item.port }} limit-learning"
+      loop: "{{ acl_port_security_ports }}"
+      loop_control:
+        label: "Port {{ item.port }} (max {{ item.max_mac | default(5) }} MACs)"
+      when:
+        - acl_port_security_enabled
+        - acl_port_security_ports | length > 0
+
+    - name: Configure rate limiting
+      extreme.exos.exos_config:
+        lines:
+          - "configure port {{ item.port }} rate-limit ingress {{ item.rate_mbps }} Mbps"
+      loop: "{{ acl_rate_limits }}"
+      loop_control:
+        label: "Port {{ item.port }} - {{ item.rate_mbps }}Mbps"
+      when: acl_rate_limits | length > 0
+
+    - name: Save configuration
+      extreme.exos.exos_config:
+        save_when: always
+      when: acl_save_config
+
+  rescue:
+    - name: Report ACL management failure
+      ansible.builtin.fail:
+        msg: >-
+          ACL management failed.
+          Error: {{ ansible_failed_result.msg | default('Unknown error') }}

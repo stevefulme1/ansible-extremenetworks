@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  role_name: switch_baseline
+  author: Red Hat Ansible
+  description: Baseline configuration for Extreme Networks switches - VLANs, STP, SNMP, NTP, syslog
+  license: GPL-3.0-or-later
+  min_ansible_version: "2.14"
+  platforms:
+    - name: EXOS
+      versions: [all]
+  galaxy_tags: [extreme, network, switching, baseline, vlan]
+dependencies: []

@@ -1,0 +1,115 @@
+---
+- name: Apply switch baseline configuration
+  block:
+    - name: Configure VLANs
+      extreme.exos.exos_vlans:
+        config:
+          - vlan_id: "{{ item.id }}"
+            name: "{{ item.name }}"
+            state: active
+        state: merged
+      loop: "{{ baseline_vlans }}"
+      loop_control:
+        label: "VLAN {{ item.id }} - {{ item.name }}"
+
+    - name: Configure STP mode
+      extreme.exos.exos_config:
+        lines:
+          - "configure stpd s0 mode {{ baseline_stp_mode }}"
+          - "configure stpd s0 priority {{ baseline_stp_priority }}"
+          - "configure stpd s0 hello-time {{ baseline_stp_hello_time }}"
+          - "configure stpd s0 forward-delay {{ baseline_stp_forward_delay }}"
+          - "configure stpd s0 max-age {{ baseline_stp_max_age }}"
+          - "enable stpd s0"
+      when: baseline_stp_enabled
+
+    - name: Configure SNMP communities
+      extreme.exos.exos_config:
+        lines:
+          - "configure snmpv3 add community {{ baseline_snmp_community_ro }} name {{ baseline_snmp_community_ro }} user v1v2c_ro"
+          - "configure snmpv3 add community {{ baseline_snmp_community_rw }} name {{ baseline_snmp_community_rw }} user v1v2c_rw"
+      when: baseline_snmp_enabled
+      no_log: true
+
+    - name: Set SNMP system info
+      extreme.exos.exos_config:
+        lines:
+          - "configure snmp sysLocation \"{{ baseline_snmp_location }}\""
+          - "configure snmp sysContact \"{{ baseline_snmp_contact }}\""
+      when:
+        - baseline_snmp_enabled
+        - baseline_snmp_location | length > 0
+
+    - name: Configure SNMP trap targets
+      extreme.exos.exos_config:
+        lines:
+          - "configure snmpv3 add target-addr {{ item.host }} param v2c_param type trap tag-list trap_list"
+      loop: "{{ baseline_snmp_trap_targets }}"
+      loop_control:
+        label: "{{ item.host }}"
+      when:
+        - baseline_snmp_enabled
+        - baseline_snmp_trap_targets | length > 0
+
+    - name: Configure NTP servers
+      extreme.exos.exos_config:
+        lines:
+          - "configure ntp server add {{ item }}"
+      loop: "{{ baseline_ntp_servers }}"
+      when: baseline_ntp_enabled
+
+    - name: Enable NTP
+      extreme.exos.exos_config:
+        lines:
+          - "enable ntp"
+          - "configure timezone name {{ baseline_ntp_timezone }}"
+      when: baseline_ntp_enabled
+
+    - name: Configure syslog servers
+      extreme.exos.exos_config:
+        lines:
+          - "configure syslog add {{ item.host }}:{{ item.port | default(514) }} vr VR-Default {{ item.facility | default('local7') }}"
+          - "configure syslog {{ item.host }}:{{ item.port | default(514) }} vr VR-Default severity {{ item.severity | default('informational') }}"
+      loop: "{{ baseline_syslog_servers }}"
+      loop_control:
+        label: "{{ item.host }}"
+      when:
+        - baseline_syslog_enabled
+        - baseline_syslog_servers | length > 0
+
+    - name: Enable syslog
+      extreme.exos.exos_config:
+        lines:
+          - "enable log target syslog"
+      when: baseline_syslog_enabled
+
+    - name: Configure DNS
+      extreme.exos.exos_config:
+        lines:
+          - "configure dns-client add name-server {{ item }}"
+      loop: "{{ baseline_dns_servers }}"
+      when: baseline_dns_servers | length > 0
+
+    - name: Configure DNS domain
+      extreme.exos.exos_config:
+        lines:
+          - "configure dns-client default-domain {{ baseline_dns_domain }}"
+      when: baseline_dns_domain | length > 0
+
+    - name: Set login banner
+      extreme.exos.exos_config:
+        lines:
+          - "configure banner {{ baseline_banner }}"
+      when: baseline_banner | length > 0
+
+    - name: Save running configuration
+      extreme.exos.exos_config:
+        save_when: always
+      when: baseline_save_config
+
+  rescue:
+    - name: Report baseline configuration failure
+      ansible.builtin.fail:
+        msg: >-
+          Switch baseline configuration failed.
+          Error: {{ ansible_failed_result.msg | default('Unknown error') }}
