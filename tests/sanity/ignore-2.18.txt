@@ -65,4 +65,3 @@ plugins/modules/xiq_network_policy.py
 plugins/modules/xiq_site_info.py
 plugins/modules/xiq_site.py
 plugins/modules/xiq_ssid_info.py
-plugins/modules/xiq_ssid.py pylint:unhashable-member
