@@ -13,9 +13,11 @@ argument_specs:
       extreme_port_provisioning_password:
         description: Authentication password
         type: str
+        no_log: true
       extreme_port_provisioning_api_key:
         description: API key for authentication
         type: str
+        no_log: true
       extreme_port_provisioning_validate_certs:
         description: Validate SSL certificates
         type: bool
