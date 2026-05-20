@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.2.0] - 2026-05-20
+
+### Added
+- 12 ExtremeCloud IQ (XIQ) modules for cloud-managed device automation:
+  - `xiq_device` / `xiq_device_info` -- manage and list devices
+  - `xiq_network_policy` / `xiq_network_policy_info` -- manage network policies
+  - `xiq_ssid` / `xiq_ssid_info` -- manage SSIDs
+  - `xiq_location` / `xiq_location_info` -- manage locations/sites
+  - `xiq_user` / `xiq_user_info` -- manage XIQ users
+  - `xiq_alert` / `xiq_alert_info` -- manage alert policies
+- `plugins/module_utils/xiq_client.py` -- shared REST API client for XIQ
+- `plugins/doc_fragments/xiq.py` -- shared auth params (xiq_token, xiq_base_url)
+- All modules support check mode and idempotent CRUD operations
+- Auth via Bearer token against `https://api.extremecloudiq.com`
+
 ## [3.0.0] - 2026-05-20
 
 ### Removed

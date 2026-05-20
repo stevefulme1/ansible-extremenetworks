@@ -1,0 +1,155 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import absolute_import, division, print_function
+
+__metaclass__ = type
+
+DOCUMENTATION = r"""
+---
+module: xiq_network_policy
+short_description: Manage network policies in ExtremeCloud IQ
+version_added: "0.2.0"
+description:
+  - Create, update, or delete network policies in ExtremeCloud IQ.
+  - Uses the XIQ REST API at C(/network-policies).
+author:
+  - Steve Fulmer (@stevefulme1)
+extends_documentation_fragment:
+  - stevefulme1.extremenetworks.xiq
+options:
+  state:
+    description:
+      - Desired state of the network policy.
+    type: str
+    choices: [present, absent]
+    default: present
+  policy_id:
+    description:
+      - Numeric ID of the network policy in XIQ.
+      - Required when O(state=absent) or when updating an existing policy.
+    type: int
+  name:
+    description:
+      - Name of the network policy.
+      - Required when creating a new policy.
+    type: str
+  description:
+    description:
+      - Description of the network policy.
+    type: str
+  ssid_ids:
+    description:
+      - List of SSID IDs to associate with this policy.
+    type: list
+    elements: int
+"""
+
+EXAMPLES = r"""
+- name: Create a network policy
+  stevefulme1.extremenetworks.xiq_network_policy:
+    xiq_token: "{{ xiq_token }}"
+    name: "Corporate WiFi Policy"
+    description: "Main office wireless policy"
+    state: present
+
+- name: Delete a network policy
+  stevefulme1.extremenetworks.xiq_network_policy:
+    xiq_token: "{{ xiq_token }}"
+    policy_id: 100
+    state: absent
+"""
+
+RETURN = r"""
+policy:
+  description: The network policy object returned by XIQ.
+  returned: when state is present
+  type: dict
+  sample:
+    id: 100
+    name: "Corporate WiFi Policy"
+"""
+
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.stevefulme1.extremenetworks.plugins.module_utils.xiq_client import (
+    XIQClient,
+    XIQClientError,
+)
+
+
+def main():
+    argument_spec = dict(
+        xiq_token=dict(type="str", required=True, no_log=True),
+        xiq_base_url=dict(type="str", default="https://api.extremecloudiq.com"),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        policy_id=dict(type="int"),
+        name=dict(type="str"),
+        description=dict(type="str"),
+        ssid_ids=dict(type="list", elements="int"),
+    )
+
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        required_if=[
+            ("state", "absent", ["policy_id"]),
+        ],
+        supports_check_mode=True,
+    )
+
+    client = XIQClient(
+        token=module.params["xiq_token"],
+        base_url=module.params["xiq_base_url"],
+    )
+    state = module.params["state"]
+    policy_id = module.params["policy_id"]
+
+    try:
+        if state == "absent":
+            try:
+                client.get_network_policy(policy_id)
+            except XIQClientError as exc:
+                if exc.status_code == 404:
+                    module.exit_json(changed=False, msg="Network policy not found.")
+                raise
+            if module.check_mode:
+                module.exit_json(changed=True, msg="Network policy would be deleted.")
+            client.delete_network_policy(policy_id)
+            module.exit_json(changed=True, msg="Network policy deleted.")
+
+        # state == present
+        if policy_id:
+            existing = client.get_network_policy(policy_id)
+            payload = {}
+            for key in ("name", "description"):
+                if module.params[key] and module.params[key] != existing.get(key):
+                    payload[key] = module.params[key]
+            if module.params["ssid_ids"] is not None:
+                payload["ssid_ids"] = module.params["ssid_ids"]
+            if not payload:
+                module.exit_json(changed=False, policy=existing)
+            if module.check_mode:
+                module.exit_json(changed=True, msg="Network policy would be updated.")
+            result = client.update_network_policy(policy_id, payload)
+            module.exit_json(changed=True, policy=result)
+        else:
+            if not module.params["name"]:
+                module.fail_json(msg="name is required to create a new network policy.")
+            payload = {"name": module.params["name"]}
+            if module.params["description"]:
+                payload["description"] = module.params["description"]
+            if module.params["ssid_ids"] is not None:
+                payload["ssid_ids"] = module.params["ssid_ids"]
+            if module.check_mode:
+                module.exit_json(changed=True, msg="Network policy would be created.")
+            result = client.create_network_policy(payload)
+            module.exit_json(changed=True, policy=result)
+
+    except XIQClientError as exc:
+        module.fail_json(msg=str(exc))
+
+
+if __name__ == "__main__":
+    main()

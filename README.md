@@ -11,12 +11,6 @@ switch infrastructure.  The roles wrap the upstream `extreme.exos` collection
 modules (`exos_config`, `exos_vlans`, etc.) and add opinionated workflows for
 common day-2 tasks.
 
-> **Note:** All custom modules and the dynamic inventory plugin were removed
-> during an audit because they used fabricated REST API endpoints that do not
-> match any real Extreme Networks API (JSONRPC, RESTCONF, or CLI).  Real EXOS
-> automation should use the official `extreme.exos` collection or the EXOS
-> JSONRPC / RESTCONF interfaces.
-
 ## Requirements
 
 - ansible-core >= 2.16
@@ -30,6 +24,26 @@ ansible-galaxy collection install stevefulme1.extremenetworks
 ```
 
 ## Included Content
+
+### Modules (ExtremeCloud IQ)
+
+| Module | Description |
+|--------|-------------|
+| `xiq_device` | Onboard, update, or remove devices |
+| `xiq_device_info` | List or retrieve device details |
+| `xiq_network_policy` | Create, update, or delete network policies |
+| `xiq_network_policy_info` | List or retrieve network policy details |
+| `xiq_ssid` | Create, update, or delete SSIDs |
+| `xiq_ssid_info` | List or retrieve SSID details |
+| `xiq_location` | Create, update, or delete locations/sites |
+| `xiq_location_info` | List or retrieve location details |
+| `xiq_user` | Create, update, or delete XIQ users |
+| `xiq_user_info` | List or retrieve user details |
+| `xiq_alert` | Create, update, or delete alert policies |
+| `xiq_alert_info` | List or retrieve alert policy details |
+
+All modules authenticate via Bearer token (`xiq_token`) against the ExtremeCloud IQ
+REST API at `https://api.extremecloudiq.com`.
 
 ### Roles
 
