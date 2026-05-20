@@ -11,11 +11,11 @@
     - name: Configure IS-IS
       extreme.exos.exos_config:
         lines:
-          - "configure isis area {{ fabric_isis_area }}"
+          - "configure isis area {{ fabric_deploy_isis_area }}"
           - "configure isis system-id {{ fabric_node_id }}"
-          - "configure isis overload-on-startup {{ fabric_isis_overload_on_startup }}"
-          - "configure isis lsp-lifetime {{ fabric_isis_lsp_lifetime }}"
-          - "configure isis spf-delay {{ fabric_isis_spf_delay }}"
+          - "configure isis overload-on-startup {{ fabric_deploy_isis_overload_on_startup }}"
+          - "configure isis lsp-lifetime {{ fabric_deploy_isis_lsp_lifetime }}"
+          - "configure isis spf-delay {{ fabric_deploy_isis_spf_delay }}"
           - "enable isis"
 
     - name: Configure SPB-M backbone VLANs
@@ -24,38 +24,38 @@
           - "create vlan {{ item.name }} tag {{ item.id }}"
           - "configure vlan {{ item.name }} add isid {{ item.isid_range_start }}"
           - "configure isis add vlan {{ item.name }} link-type point-to-point"
-      loop: "{{ fabric_bvlans }}"
+      loop: "{{ fabric_deploy_bvlans }}"
       loop_control:
         label: "BVLAN {{ item.id }} - {{ item.name }}"
-      when: fabric_type == "spbm"
+      when: fabric_deploy_type == "spbm"
 
     - name: Configure SPB nickname
       extreme.exos.exos_config:
         lines:
           - "configure isis spbm node-nickname {{ fabric_nickname }}"
-      when: fabric_type == "spbm"
+      when: fabric_deploy_type == "spbm"
 
     - name: Create fabric service instances
       extreme.exos.exos_config:
         lines:
           - "create vlan {{ item.name }} tag {{ item.vlan_id }}"
           - "configure vlan {{ item.name }} add isid {{ item.isid }}"
-      loop: "{{ fabric_services }}"
+      loop: "{{ fabric_deploy_services }}"
       loop_control:
         label: "ISID {{ item.isid }} -> VLAN {{ item.vlan_id }}"
       when:
-        - fabric_type == "spbm"
-        - fabric_services | length > 0
+        - fabric_deploy_type == "spbm"
+        - fabric_deploy_services | length > 0
 
     - name: Configure VXLAN VTEP
       extreme.exos.exos_config:
         lines:
           - "create vxlan vtep vtep1"
-          - "configure vxlan vtep vtep1 source-ip {{ fabric_vxlan_vtep_ip }}"
+          - "configure vxlan vtep vtep1 source-ip {{ fabric_deploy_vxlan_vtep_ip }}"
           - "enable vxlan vtep vtep1"
       when:
-        - fabric_type == "vxlan"
-        - fabric_vxlan_vtep_ip | length > 0
+        - fabric_deploy_type == "vxlan"
+        - fabric_deploy_vxlan_vtep_ip | length > 0
 
     - name: Configure VXLAN VNIs
       extreme.exos.exos_config:
@@ -63,33 +63,33 @@
           - "create vxlan vni {{ item.vni }}"
           - "configure vxlan vni {{ item.vni }} vlan {{ item.vlan_id }}"
           - "configure vxlan vni {{ item.vni }} vtep vtep1"
-      loop: "{{ fabric_vxlan_vnis }}"
+      loop: "{{ fabric_deploy_vxlan_vnis }}"
       loop_control:
         label: "VNI {{ item.vni }} -> VLAN {{ item.vlan_id }}"
       when:
-        - fabric_type == "vxlan"
-        - fabric_vxlan_vnis | length > 0
+        - fabric_deploy_type == "vxlan"
+        - fabric_deploy_vxlan_vnis | length > 0
 
     - name: Configure fabric uplink ports
       extreme.exos.exos_config:
         lines:
           - "configure port {{ item.port }} description-string \"{{ item.description }}\""
           - "enable port {{ item.port }}"
-      loop: "{{ fabric_uplink_ports }}"
+      loop: "{{ fabric_deploy_uplink_ports }}"
       loop_control:
         label: "Port {{ item.port }}"
-      when: fabric_uplink_ports | length > 0
+      when: fabric_deploy_uplink_ports | length > 0
 
     - name: Enable multicast over fabric
       extreme.exos.exos_config:
         lines:
           - "enable isis multicast"
-      when: fabric_multicast_enabled
+      when: fabric_deploy_multicast_enabled
 
     - name: Save configuration
       extreme.exos.exos_config:
         save_when: always
-      when: fabric_save_config
+      when: fabric_deploy_save_config
 
   rescue:
     - name: Report fabric deployment failure

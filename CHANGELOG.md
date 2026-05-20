@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.0.0] - 2026-05-20
+
+### Removed
+- **All 68 custom modules deleted** -- every module used fabricated REST API
+  endpoints (`/api/v1/<resource>`) that do not exist in any Extreme Networks
+  product (EXOS JSONRPC/RESTCONF, VOSS CLI, SLX-OS CLI, or ExtremeCloud IQ
+  REST API).  Real EXOS automation should use the official `extreme.exos`
+  collection or the EXOS JSONRPC / RESTCONF interfaces.
+- Dynamic inventory plugin (`extremenetworks_inventory`) removed -- used same
+  fabricated `/api/v1/hosts` endpoint.
+- Fabricated `api_client.py` module utility removed.
+
+### Retained
+- 12 operational roles that wrap the upstream `extreme.exos` collection.
+- EDA source plugins (if present).
+- CI/CD workflows and test infrastructure.
+
 ## [2.1.2] - 2026-05-18
 
 ### Security

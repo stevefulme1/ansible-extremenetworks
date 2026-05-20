@@ -1,6 +1,6 @@
 ---
 # VLANs
-baseline_vlans:
+switch_baseline_vlans:
   - id: 1
     name: "Default"
   - id: 100
@@ -9,44 +9,44 @@ baseline_vlans:
     name: "Servers"
 
 # STP
-baseline_stp_enabled: true
-baseline_stp_mode: "rstp"
-baseline_stp_priority: 32768
-baseline_stp_hello_time: 2
-baseline_stp_forward_delay: 15
-baseline_stp_max_age: 20
+switch_baseline_stp_enabled: true
+switch_baseline_stp_mode: "rstp"
+switch_baseline_stp_priority: 32768
+switch_baseline_stp_hello_time: 2
+switch_baseline_stp_forward_delay: 15
+switch_baseline_stp_max_age: 20
 
 # SNMP
-baseline_snmp_enabled: true
-baseline_snmp_community_ro: "{{ lookup('env', 'SNMP_COMMUNITY_RO') | default('public', true) }}"
-baseline_snmp_community_rw: "{{ lookup('env', 'SNMP_COMMUNITY_RW') | default('private', true) }}"
-baseline_snmp_location: ""
-baseline_snmp_contact: ""
-baseline_snmp_trap_targets: []
+switch_baseline_snmp_enabled: true
+switch_baseline_snmp_community_ro: "{{ lookup('env', 'SNMP_COMMUNITY_RO') | default('public', true) }}"
+switch_baseline_snmp_community_rw: "{{ lookup('env', 'SNMP_COMMUNITY_RW') | default('private', true) }}"
+switch_baseline_snmp_location: ""
+switch_baseline_snmp_contact: ""
+switch_baseline_snmp_trap_targets: []
 #   - host: "10.0.0.100"
 #     port: 162
-#     community: "{{ baseline_snmp_community_ro }}"
+#     community: "{{ switch_baseline_snmp_community_ro }}"
 
 # NTP
-baseline_ntp_enabled: true
-baseline_ntp_servers:
+switch_baseline_ntp_enabled: true
+switch_baseline_ntp_servers:
   - "pool.ntp.org"
-baseline_ntp_timezone: "UTC"
+switch_baseline_ntp_timezone: "UTC"
 
 # Syslog
-baseline_syslog_enabled: true
-baseline_syslog_servers: []
+switch_baseline_syslog_enabled: true
+switch_baseline_syslog_servers: []
 #   - host: "10.0.0.200"
 #     port: 514
 #     facility: "local7"
 #     severity: "informational"
 
 # DNS
-baseline_dns_servers: []
-baseline_dns_domain: ""
+switch_baseline_dns_servers: []
+switch_baseline_dns_domain: ""
 
 # Banner
-baseline_banner: ""
+switch_baseline_banner: ""
 
 # Save config
-baseline_save_config: true
+switch_baseline_save_config: true

@@ -1,15 +1,27 @@
 # stevefulme1.extremenetworks
 
-Ansible Collection for Extreme Networks -- EXOS, VOSS/Fabric Engine, SLX-OS, ExtremeCloud IQ with ACLs, BGP, VXLAN, SPB fabric, and EDA telemetry.
+Ansible Collection for Extreme Networks -- EXOS, VOSS/Fabric Engine, SLX-OS, ExtremeCloud IQ.
+
+**Status: Pre-release. Under active development.**
 
 ## Overview
 
-This collection provides **69 modules** for automating Extreme Networks switch infrastructure, along with 13 operational roles, a dynamic inventory plugin, and CI/CD workflows.
+This collection provides operational roles for automating Extreme Networks
+switch infrastructure.  The roles wrap the upstream `extreme.exos` collection
+modules (`exos_config`, `exos_vlans`, etc.) and add opinionated workflows for
+common day-2 tasks.
+
+> **Note:** All custom modules and the dynamic inventory plugin were removed
+> during an audit because they used fabricated REST API endpoints that do not
+> match any real Extreme Networks API (JSONRPC, RESTCONF, or CLI).  Real EXOS
+> automation should use the official `extreme.exos` collection or the EXOS
+> JSONRPC / RESTCONF interfaces.
 
 ## Requirements
 
 - ansible-core >= 2.16
 - Python >= 3.11
+- `extreme.exos` collection (for roles that reference `extreme.exos.exos_config`)
 
 ## Installation
 
@@ -17,29 +29,13 @@ This collection provides **69 modules** for automating Extreme Networks switch i
 ansible-galaxy collection install stevefulme1.extremenetworks
 ```
 
-Or from source:
-
-```bash
-ansible-galaxy collection build
-ansible-galaxy collection install stevefulme1-extremenetworks-2.0.0.tar.gz
-```
-
 ## Included Content
 
-### Modules (69)
-
-CRUD and info modules covering:
-
-- **EXOS** — VLANs, ports, ACLs, STP, OSPF, BGP, MLAG, stacking
-- **VOSS/Fabric Engine** — SPB fabric, IS-IS, VXLAN, IP shortcuts
-- **SLX-OS** — interfaces, VRF, route maps, prefix lists
-- **ExtremeCloud IQ** — device onboarding, policy management, monitoring
-- **Cross-platform** — firmware, backup/restore, configuration management
-
-### Roles (13)
+### Roles
 
 | Role | Description |
 |------|-------------|
+| `acl_management` | Configure ACLs via `exos_config` |
 | `extreme_acl_management` | Configure ACLs across platforms |
 | `extreme_backup_restore` | Backup and restore switch configs |
 | `extreme_bgp_setup` | Configure BGP peering |
@@ -49,28 +45,9 @@ CRUD and info modules covering:
 | `extreme_port_provisioning` | Provision switch ports |
 | `extreme_security_hardening` | Security baseline configuration |
 | `extreme_vlan_deploy` | VLAN provisioning and management |
-| `extreme_xiq_onboard` | ExtremeCloud IQ device onboarding |
-| `acl_management` | Legacy ACL role |
-| `fabric_deploy` | Legacy fabric deployment |
+| `fabric_deploy` | Fabric deployment via `exos_config` |
 | `switch_baseline` | Switch baseline configuration |
-
-### Inventory Plugin
-
-- `extremenetworks_inventory` -- Dynamic inventory from Extreme Networks devices
-
-## Usage
-
-```yaml
-- name: Create a VLAN on EXOS switch
-  stevefulme1.extremenetworks.exos_vlan:
-    host: "{{ switch_host }}"
-    username: "{{ switch_user }}"
-    password: "{{ switch_pass }}"
-    name: SERVERS
-    vlan_id: 100
-    state: present
-```
 
 ## License
 
-Apache-2.0
+GPL-3.0-or-later

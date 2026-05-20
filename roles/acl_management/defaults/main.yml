@@ -1,6 +1,6 @@
 ---
 # ACL policies
-acl_policies: []
+acl_management_policies: []
 #   - name: "BLOCK-TELNET"
 #     type: "ipv4"
 #     rules:
@@ -16,27 +16,27 @@ acl_policies: []
 #         destination: "any"
 
 # ACL application to ports
-acl_port_bindings: []
+acl_management_port_bindings: []
 #   - policy: "BLOCK-TELNET"
 #     ports: ["1", "2", "3"]
 #     direction: "ingress"
 
 # ACL application to VLANs
-acl_vlan_bindings: []
+acl_management_vlan_bindings: []
 #   - policy: "BLOCK-TELNET"
 #     vlan: "Management"
 #     direction: "ingress"
 
 # Port security
-acl_port_security_enabled: false
-acl_port_security_ports: []
+acl_management_port_security_enabled: false
+acl_management_port_security_ports: []
 #   - port: "1"
 #     max_mac: 5
 #     violation_action: "disable"
 #     sticky: false
 
 # MAC-based ACL
-acl_mac_policies: []
+acl_management_mac_policies: []
 #   - name: "ALLOW-SERVERS"
 #     rules:
 #       - entry: 10
@@ -45,11 +45,11 @@ acl_mac_policies: []
 #         source_mask: "ff:ff:ff:ff:ff:ff"
 
 # Rate limiting
-acl_rate_limits: []
+acl_management_rate_limits: []
 #   - port: "1"
 #     rate_mbps: 100
 #     burst_kbytes: 1024
 
 # Save
-acl_save_config: true
-acl_purge_unmanaged: false
+acl_management_save_config: true
+acl_management_purge_unmanaged: false
