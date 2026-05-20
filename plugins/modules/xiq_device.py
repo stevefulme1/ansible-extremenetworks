@@ -127,7 +127,8 @@ def main():
             payload = {}
             if module.params["hostname"] and module.params["hostname"] != existing.get("hostname"):
                 payload["hostname"] = module.params["hostname"]
-            if module.params["network_policy_id"] and module.params["network_policy_id"] != existing.get("network_policy_id"):
+            np_id = module.params["network_policy_id"]
+            if np_id and np_id != existing.get("network_policy_id"):
                 payload["network_policy_id"] = module.params["network_policy_id"]
             if not payload:
                 module.exit_json(changed=False, device=existing)
