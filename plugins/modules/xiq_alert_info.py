@@ -9,20 +9,20 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: xiq_ssid_info
-short_description: Retrieve SSID information from ExtremeCloud IQ
+module: xiq_alert_info
+short_description: Retrieve alert policy information from ExtremeCloud IQ
 version_added: "0.2.0"
 description:
-  - Query SSIDs in ExtremeCloud IQ.
-  - Returns a single SSID when O(ssid_id) is given, otherwise lists all SSIDs.
+  - Query alert policies in ExtremeCloud IQ.
+  - Returns a single policy when O(policy_id) is given, otherwise lists all policies.
 author:
   - Steve Fulmer (@stevefulme1)
 extends_documentation_fragment:
   - stevefulme1.extremenetworks.xiq
 options:
-  ssid_id:
+  policy_id:
     description:
-      - Numeric ID of a specific SSID to retrieve.
+      - Numeric ID of a specific alert policy to retrieve.
     type: int
   page:
     description:
@@ -31,33 +31,33 @@ options:
     default: 1
   limit:
     description:
-      - Maximum number of SSIDs per page.
+      - Maximum number of policies per page.
     type: int
     default: 100
 """
 
 EXAMPLES = r"""
-- name: List all SSIDs
-  stevefulme1.extremenetworks.xiq_ssid_info:
+- name: List all alert policies
+  stevefulme1.extremenetworks.xiq_alert_info:
     xiq_token: "{{ xiq_token }}"
-  register: ssids
+  register: alerts
 
-- name: Get a specific SSID
-  stevefulme1.extremenetworks.xiq_ssid_info:
+- name: Get a specific alert policy
+  stevefulme1.extremenetworks.xiq_alert_info:
     xiq_token: "{{ xiq_token }}"
-    ssid_id: 200
-  register: ssid
+    policy_id: 500
+  register: alert
 """
 
 RETURN = r"""
-ssids:
-  description: List of SSID objects.
-  returned: when ssid_id is not specified
+policies:
+  description: List of alert policy objects.
+  returned: when policy_id is not specified
   type: list
   elements: dict
-ssid:
-  description: A single SSID object.
-  returned: when ssid_id is specified
+policy:
+  description: A single alert policy object.
+  returned: when policy_id is specified
   type: dict
 """
 
@@ -73,7 +73,7 @@ def main():
     argument_spec = dict(
         xiq_token=dict(type="str", required=True, no_log=True),
         xiq_base_url=dict(type="str", default="https://api.extremecloudiq.com"),
-        ssid_id=dict(type="int"),
+        policy_id=dict(type="int"),
         page=dict(type="int", default=1),
         limit=dict(type="int", default=100),
     )
@@ -89,16 +89,16 @@ def main():
     )
 
     try:
-        if module.params["ssid_id"]:
-            result = client.get_ssid(module.params["ssid_id"])
-            module.exit_json(changed=False, ssid=result)
+        if module.params["policy_id"]:
+            result = client.get_alert_policy(module.params["policy_id"])
+            module.exit_json(changed=False, policy=result)
         else:
-            result = client.list_ssids(
+            result = client.list_alert_policies(
                 page=module.params["page"],
                 limit=module.params["limit"],
             )
-            ssids = result.get("data", result) if isinstance(result, dict) else result
-            module.exit_json(changed=False, ssids=ssids)
+            policies = result.get("data", result) if isinstance(result, dict) else result
+            module.exit_json(changed=False, policies=policies)
     except XIQClientError as exc:
         module.fail_json(msg=str(exc))
 

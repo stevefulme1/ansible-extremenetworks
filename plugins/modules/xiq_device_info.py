@@ -1,120 +1,106 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright 2026 Steve Fulmer
-# Apache-2.0 (see LICENSE)
-# GNU General Public License v3.0+
-# (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-
-"""xiq_device_info module."""
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
 module: xiq_device_info
-short_description: Retrieve xiq device information
+short_description: Retrieve device information from ExtremeCloud IQ
+version_added: "0.2.0"
 description:
-    - Retrieve details about xiq devices.
-    - Read-only module.
-version_added: "1.0.0"
+  - Query devices managed by ExtremeCloud IQ.
+  - Returns a single device when O(device_id) is given, otherwise lists all devices.
 author:
-    - Steve Fulmer (@stevefulme1)
+  - Steve Fulmer (@stevefulme1)
+extends_documentation_fragment:
+  - stevefulme1.extremenetworks.xiq
 options:
-    host:
-        description: API host address.
-        type: str
-        required: true
-    device_id:
-        description: ID of a specific resource.
-        type: str
-    name:
-        description: Filter by name.
-        type: str
-    username:
-        description: Authentication username.
-        type: str
-    password:
-        description: Authentication password.
-        type: str
-    api_key:
-        description: API key for authentication.
-        type: str
-    validate_certs:
-        description: Validate SSL certificates.
-        type: bool
-        default: true
-    limit:
-        description:
-          - Maximum number of results to return.
-        type: int
-        default: 100
-    offset:
-        description:
-          - Number of results to skip for pagination.
-        type: int
-        default: 0
+  device_id:
+    description:
+      - Numeric ID of a specific device to retrieve.
+    type: int
+  page:
+    description:
+      - Page number for paginated results.
+    type: int
+    default: 1
+  limit:
+    description:
+      - Maximum number of devices per page.
+    type: int
+    default: 100
 """
 
 EXAMPLES = r"""
-- name: List all xiq devices
+- name: List all devices
   stevefulme1.extremenetworks.xiq_device_info:
-    host: api.example.com
-  register: result
+    xiq_token: "{{ xiq_token }}"
+  register: devices
 
-- name: Get a specific xiq device
+- name: Get a specific device
   stevefulme1.extremenetworks.xiq_device_info:
-    host: api.example.com
-    device_id: "example-id"
-  register: result
+    xiq_token: "{{ xiq_token }}"
+    device_id: 12345
+  register: device
 """
 
 RETURN = r"""
-xiq_devices:
-    description: List of resource details.
-    returned: always
-    type: list
-    elements: dict
+devices:
+  description: List of device objects.
+  returned: when device_id is not specified
+  type: list
+  elements: dict
+device:
+  description: A single device object.
+  returned: when device_id is specified
+  type: dict
 """
 
 from ansible.module_utils.basic import AnsibleModule
 
-try:
-    from ansible_collections.stevefulme1.extremenetworks.plugins.module_utils.api_client import ApiClient
-    HAS_CLIENT = True
-except ImportError:
-    HAS_CLIENT = False
+from ansible_collections.stevefulme1.extremenetworks.plugins.module_utils.xiq_client import (
+    XIQClient,
+    XIQClientError,
+)
 
 
 def main():
+    argument_spec = dict(
+        xiq_token=dict(type="str", required=True, no_log=True),
+        xiq_base_url=dict(type="str", default="https://api.extremecloudiq.com"),
+        device_id=dict(type="int"),
+        page=dict(type="int", default=1),
+        limit=dict(type="int", default=100),
+    )
+
     module = AnsibleModule(
-        argument_spec=dict(
-            limit=dict(type='int', default=100),
-            offset=dict(type='int', default=0),
-            device_id=dict(type="str"),
-            name=dict(type="str"),
-            host=dict(type="str", required=True),
-            username=dict(type="str"),
-            password=dict(type="str", no_log=True),
-            api_key=dict(type="str", no_log=True),
-            validate_certs=dict(type="bool", default=True),
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True,
     )
 
-    if not HAS_CLIENT:
-        module.fail_json(msg="Required Python libraries not found.")
+    client = XIQClient(
+        token=module.params["xiq_token"],
+        base_url=module.params["xiq_base_url"],
+    )
 
-    client = ApiClient(module)
-    resource_id = module.params.get("device_id")
-
-    if resource_id:
-        result = client.get("xiq_device", resource_id)
-        resources = [result] if result else []
-    else:
-        resources = client.list("xiq_device", module.params)
-
-    module.exit_json(changed=False, xiq_devices=resources)
+    try:
+        if module.params["device_id"]:
+            result = client.get_device(module.params["device_id"])
+            module.exit_json(changed=False, device=result)
+        else:
+            result = client.list_devices(
+                page=module.params["page"],
+                limit=module.params["limit"],
+            )
+            devices = result.get("data", result) if isinstance(result, dict) else result
+            module.exit_json(changed=False, devices=devices)
+    except XIQClientError as exc:
+        module.fail_json(msg=str(exc))
 
 
 if __name__ == "__main__":

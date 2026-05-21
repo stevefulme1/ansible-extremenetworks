@@ -9,20 +9,20 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: xiq_ssid_info
-short_description: Retrieve SSID information from ExtremeCloud IQ
+module: xiq_user_info
+short_description: Retrieve user information from ExtremeCloud IQ
 version_added: "0.2.0"
 description:
-  - Query SSIDs in ExtremeCloud IQ.
-  - Returns a single SSID when O(ssid_id) is given, otherwise lists all SSIDs.
+  - Query users in the ExtremeCloud IQ account.
+  - Returns a single user when O(user_id) is given, otherwise lists all users.
 author:
   - Steve Fulmer (@stevefulme1)
 extends_documentation_fragment:
   - stevefulme1.extremenetworks.xiq
 options:
-  ssid_id:
+  user_id:
     description:
-      - Numeric ID of a specific SSID to retrieve.
+      - Numeric ID of a specific user to retrieve.
     type: int
   page:
     description:
@@ -31,33 +31,33 @@ options:
     default: 1
   limit:
     description:
-      - Maximum number of SSIDs per page.
+      - Maximum number of users per page.
     type: int
     default: 100
 """
 
 EXAMPLES = r"""
-- name: List all SSIDs
-  stevefulme1.extremenetworks.xiq_ssid_info:
+- name: List all users
+  stevefulme1.extremenetworks.xiq_user_info:
     xiq_token: "{{ xiq_token }}"
-  register: ssids
+  register: users
 
-- name: Get a specific SSID
-  stevefulme1.extremenetworks.xiq_ssid_info:
+- name: Get a specific user
+  stevefulme1.extremenetworks.xiq_user_info:
     xiq_token: "{{ xiq_token }}"
-    ssid_id: 200
-  register: ssid
+    user_id: 400
+  register: user
 """
 
 RETURN = r"""
-ssids:
-  description: List of SSID objects.
-  returned: when ssid_id is not specified
+users:
+  description: List of user objects.
+  returned: when user_id is not specified
   type: list
   elements: dict
-ssid:
-  description: A single SSID object.
-  returned: when ssid_id is specified
+user:
+  description: A single user object.
+  returned: when user_id is specified
   type: dict
 """
 
@@ -73,7 +73,7 @@ def main():
     argument_spec = dict(
         xiq_token=dict(type="str", required=True, no_log=True),
         xiq_base_url=dict(type="str", default="https://api.extremecloudiq.com"),
-        ssid_id=dict(type="int"),
+        user_id=dict(type="int"),
         page=dict(type="int", default=1),
         limit=dict(type="int", default=100),
     )
@@ -89,16 +89,16 @@ def main():
     )
 
     try:
-        if module.params["ssid_id"]:
-            result = client.get_ssid(module.params["ssid_id"])
-            module.exit_json(changed=False, ssid=result)
+        if module.params["user_id"]:
+            result = client.get_user(module.params["user_id"])
+            module.exit_json(changed=False, user=result)
         else:
-            result = client.list_ssids(
+            result = client.list_users(
                 page=module.params["page"],
                 limit=module.params["limit"],
             )
-            ssids = result.get("data", result) if isinstance(result, dict) else result
-            module.exit_json(changed=False, ssids=ssids)
+            users = result.get("data", result) if isinstance(result, dict) else result
+            module.exit_json(changed=False, users=users)
     except XIQClientError as exc:
         module.fail_json(msg=str(exc))
 

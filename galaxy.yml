@@ -1,14 +1,14 @@
 ---
 namespace: stevefulme1
 name: extremenetworks
-version: 2.1.2
+version: 0.1.0
 readme: README.md
 authors:
   - Steve Fulmer <sfulmer@redhat.com>
 description: >-
   Ansible Collection for Extreme Networks — EXOS, VOSS/Fabric Engine, SLX-OS, ExtremeCloud IQ with ACLs, BGP, VXLAN, SPB fabric, and EDA telemetry
-license_file: LICENSE
-tags: [extremenetworks]
+  Status: Pre-release. Under active development.
+tags: [networking]
 repository: https://github.com/stevefulme1/ansible-extremenetworks
 documentation: https://github.com/stevefulme1/ansible-extremenetworks
 issues: https://github.com/stevefulme1/ansible-extremenetworks/issues

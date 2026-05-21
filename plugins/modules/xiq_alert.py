@@ -9,12 +9,12 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: xiq_network_policy
-short_description: Manage network policies in ExtremeCloud IQ
+module: xiq_alert
+short_description: Manage alert policies in ExtremeCloud IQ
 version_added: "0.2.0"
 description:
-  - Create, update, or delete network policies in ExtremeCloud IQ.
-  - Uses the XIQ REST API at C(/network-policies).
+  - Create, update, or delete alert policies in ExtremeCloud IQ.
+  - Uses the XIQ REST API at C(/alert-policies).
 author:
   - Steve Fulmer (@stevefulme1)
 extends_documentation_fragment:
@@ -22,54 +22,61 @@ extends_documentation_fragment:
 options:
   state:
     description:
-      - Desired state of the network policy.
+      - Desired state of the alert policy.
     type: str
     choices: [present, absent]
     default: present
   policy_id:
     description:
-      - Numeric ID of the network policy in XIQ.
+      - Numeric ID of the alert policy in XIQ.
       - Required when O(state=absent) or when updating an existing policy.
     type: int
   name:
     description:
-      - Name of the network policy.
+      - Name of the alert policy.
       - Required when creating a new policy.
     type: str
   description:
     description:
-      - Description of the network policy.
+      - Description of the alert policy.
     type: str
-  ssid_ids:
+  severity:
     description:
-      - List of SSID IDs to associate with this policy.
-    type: list
-    elements: int
+      - Severity level of the alert policy.
+    type: str
+    choices: [CRITICAL, MAJOR, MINOR, INFORMATIONAL]
+  enabled:
+    description:
+      - Whether the alert policy is enabled.
+    type: bool
 """
 
 EXAMPLES = r"""
-- name: Create a network policy
-  stevefulme1.extremenetworks.xiq_network_policy:
+- name: Create an alert policy
+  stevefulme1.extremenetworks.xiq_alert:
     xiq_token: "{{ xiq_token }}"
-    name: "Corporate WiFi Policy"
-    description: "Main office wireless policy"
+    name: "AP Down Alert"
+    description: "Alert when an AP goes offline"
+    severity: CRITICAL
+    enabled: true
     state: present
 
-- name: Delete a network policy
-  stevefulme1.extremenetworks.xiq_network_policy:
+- name: Delete an alert policy
+  stevefulme1.extremenetworks.xiq_alert:
     xiq_token: "{{ xiq_token }}"
-    policy_id: 100
+    policy_id: 500
     state: absent
 """
 
 RETURN = r"""
 policy:
-  description: The network policy object returned by XIQ.
+  description: The alert policy object returned by XIQ.
   returned: when state is present
   type: dict
   sample:
-    id: 100
-    name: "Corporate WiFi Policy"
+    id: 500
+    name: "AP Down Alert"
+    severity: "CRITICAL"
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -88,7 +95,11 @@ def main():
         policy_id=dict(type="int"),
         name=dict(type="str"),
         description=dict(type="str"),
-        ssid_ids=dict(type="list", elements="int"),
+        severity=dict(
+            type="str",
+            choices=["CRITICAL", "MAJOR", "MINOR", "INFORMATIONAL"],
+        ),
+        enabled=dict(type="bool"),
     )
 
     module = AnsibleModule(
@@ -109,42 +120,43 @@ def main():
     try:
         if state == "absent":
             try:
-                client.get_network_policy(policy_id)
+                client.get_alert_policy(policy_id)
             except XIQClientError as exc:
                 if exc.status_code == 404:
-                    module.exit_json(changed=False, msg="Network policy not found.")
+                    module.exit_json(changed=False, msg="Alert policy not found.")
                 raise
             if module.check_mode:
-                module.exit_json(changed=True, msg="Network policy would be deleted.")
-            client.delete_network_policy(policy_id)
-            module.exit_json(changed=True, msg="Network policy deleted.")
+                module.exit_json(changed=True, msg="Alert policy would be deleted.")
+            client.delete_alert_policy(policy_id)
+            module.exit_json(changed=True, msg="Alert policy deleted.")
 
         # state == present
         if policy_id:
-            existing = client.get_network_policy(policy_id)
+            existing = client.get_alert_policy(policy_id)
             payload = {}
-            for key in ("name", "description"):
+            for key in ("name", "description", "severity"):
                 if module.params[key] and module.params[key] != existing.get(key):
                     payload[key] = module.params[key]
-            if module.params["ssid_ids"] is not None:
-                payload["ssid_ids"] = module.params["ssid_ids"]
+            if module.params["enabled"] is not None and module.params["enabled"] != existing.get("enabled"):
+                payload["enabled"] = module.params["enabled"]
             if not payload:
                 module.exit_json(changed=False, policy=existing)
             if module.check_mode:
-                module.exit_json(changed=True, msg="Network policy would be updated.")
-            result = client.update_network_policy(policy_id, payload)
+                module.exit_json(changed=True, msg="Alert policy would be updated.")
+            result = client.update_alert_policy(policy_id, payload)
             module.exit_json(changed=True, policy=result)
         else:
             if not module.params["name"]:
-                module.fail_json(msg="name is required to create a new network policy.")
+                module.fail_json(msg="name is required to create a new alert policy.")
             payload = {"name": module.params["name"]}
-            if module.params["description"]:
-                payload["description"] = module.params["description"]
-            if module.params["ssid_ids"] is not None:
-                payload["ssid_ids"] = module.params["ssid_ids"]
+            for key in ("description", "severity"):
+                if module.params[key]:
+                    payload[key] = module.params[key]
+            if module.params["enabled"] is not None:
+                payload["enabled"] = module.params["enabled"]
             if module.check_mode:
-                module.exit_json(changed=True, msg="Network policy would be created.")
-            result = client.create_network_policy(payload)
+                module.exit_json(changed=True, msg="Alert policy would be created.")
+            result = client.create_alert_policy(payload)
             module.exit_json(changed=True, policy=result)
 
     except XIQClientError as exc:

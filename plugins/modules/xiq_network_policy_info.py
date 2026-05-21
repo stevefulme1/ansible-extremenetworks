@@ -1,120 +1,106 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright 2026 Steve Fulmer
-# Apache-2.0 (see LICENSE)
-# GNU General Public License v3.0+
-# (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-
-"""xiq_network_policy_info module."""
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
 module: xiq_network_policy_info
-short_description: Retrieve xiq policy information
+short_description: Retrieve network policy information from ExtremeCloud IQ
+version_added: "0.2.0"
 description:
-    - Retrieve details about xiq policys.
-    - Read-only module.
-version_added: "1.0.0"
+  - Query network policies in ExtremeCloud IQ.
+  - Returns a single policy when O(policy_id) is given, otherwise lists all policies.
 author:
-    - Steve Fulmer (@stevefulme1)
+  - Steve Fulmer (@stevefulme1)
+extends_documentation_fragment:
+  - stevefulme1.extremenetworks.xiq
 options:
-    host:
-        description: API host address.
-        type: str
-        required: true
-    policy_id:
-        description: ID of a specific resource.
-        type: str
-    name:
-        description: Filter by name.
-        type: str
-    username:
-        description: Authentication username.
-        type: str
-    password:
-        description: Authentication password.
-        type: str
-    api_key:
-        description: API key for authentication.
-        type: str
-    validate_certs:
-        description: Validate SSL certificates.
-        type: bool
-        default: true
-    limit:
-        description:
-          - Maximum number of results to return.
-        type: int
-        default: 100
-    offset:
-        description:
-          - Number of results to skip for pagination.
-        type: int
-        default: 0
+  policy_id:
+    description:
+      - Numeric ID of a specific network policy to retrieve.
+    type: int
+  page:
+    description:
+      - Page number for paginated results.
+    type: int
+    default: 1
+  limit:
+    description:
+      - Maximum number of policies per page.
+    type: int
+    default: 100
 """
 
 EXAMPLES = r"""
-- name: List all xiq policys
+- name: List all network policies
   stevefulme1.extremenetworks.xiq_network_policy_info:
-    host: api.example.com
-  register: result
+    xiq_token: "{{ xiq_token }}"
+  register: policies
 
-- name: Get a specific xiq policy
+- name: Get a specific network policy
   stevefulme1.extremenetworks.xiq_network_policy_info:
-    host: api.example.com
-    policy_id: "example-id"
-  register: result
+    xiq_token: "{{ xiq_token }}"
+    policy_id: 100
+  register: policy
 """
 
 RETURN = r"""
-xiq_policys:
-    description: List of resource details.
-    returned: always
-    type: list
-    elements: dict
+policies:
+  description: List of network policy objects.
+  returned: when policy_id is not specified
+  type: list
+  elements: dict
+policy:
+  description: A single network policy object.
+  returned: when policy_id is specified
+  type: dict
 """
 
 from ansible.module_utils.basic import AnsibleModule
 
-try:
-    from ansible_collections.stevefulme1.extremenetworks.plugins.module_utils.api_client import ApiClient
-    HAS_CLIENT = True
-except ImportError:
-    HAS_CLIENT = False
+from ansible_collections.stevefulme1.extremenetworks.plugins.module_utils.xiq_client import (
+    XIQClient,
+    XIQClientError,
+)
 
 
 def main():
+    argument_spec = dict(
+        xiq_token=dict(type="str", required=True, no_log=True),
+        xiq_base_url=dict(type="str", default="https://api.extremecloudiq.com"),
+        policy_id=dict(type="int"),
+        page=dict(type="int", default=1),
+        limit=dict(type="int", default=100),
+    )
+
     module = AnsibleModule(
-        argument_spec=dict(
-            limit=dict(type='int', default=100),
-            offset=dict(type='int', default=0),
-            policy_id=dict(type="str"),
-            name=dict(type="str"),
-            host=dict(type="str", required=True),
-            username=dict(type="str"),
-            password=dict(type="str", no_log=True),
-            api_key=dict(type="str", no_log=True),
-            validate_certs=dict(type="bool", default=True),
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True,
     )
 
-    if not HAS_CLIENT:
-        module.fail_json(msg="Required Python libraries not found.")
+    client = XIQClient(
+        token=module.params["xiq_token"],
+        base_url=module.params["xiq_base_url"],
+    )
 
-    client = ApiClient(module)
-    resource_id = module.params.get("policy_id")
-
-    if resource_id:
-        result = client.get("xiq_policy", resource_id)
-        resources = [result] if result else []
-    else:
-        resources = client.list("xiq_policy", module.params)
-
-    module.exit_json(changed=False, xiq_policys=resources)
+    try:
+        if module.params["policy_id"]:
+            result = client.get_network_policy(module.params["policy_id"])
+            module.exit_json(changed=False, policy=result)
+        else:
+            result = client.list_network_policies(
+                page=module.params["page"],
+                limit=module.params["limit"],
+            )
+            policies = result.get("data", result) if isinstance(result, dict) else result
+            module.exit_json(changed=False, policies=policies)
+    except XIQClientError as exc:
+        module.fail_json(msg=str(exc))
 
 
 if __name__ == "__main__":
